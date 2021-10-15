@@ -76,7 +76,7 @@ func (it *itemsController) Get(w http.ResponseWriter, r *http.Request) {
 
 	item, idErr := services.ItemsService.Get(itemId)
 	if idErr != nil {
-		http_utils.RespondJson(w, idErr.Status(), err)
+		http_utils.RespondJson(w, idErr.Status(), idErr)
 		return
 	}
 	http_utils.RespondJson(w, http.StatusOK, item)

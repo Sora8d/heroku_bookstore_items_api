@@ -21,6 +21,7 @@ const (
 	queryBuild                = "SELECT item.id, item.seller, item.title FROM item INNER JOIN description d ON item.id = d.item_id WHERE %s;"
 
 	picturetable = "picture"
+	errornorows  = "no rows in result set"
 )
 
 var (
@@ -74,6 +75,9 @@ func (i *Item) Get() rest_errors.RestErr {
 
 	itemRow := tx.QueryRow(ctx, queryGetItem, i.Id)
 	if err := itemRow.Scan(&i.Id, &i.Seller, &i.Title); err != nil {
+		if err.Error() == errornorows {
+			return rest_errors.NewNotFoundError("No user with given id")
+		}
 		logger.Error("There was an error in the get function in items dao", err)
 		return rest_errors.NewInternalServerError("error when trying to get item", errors.New("database error"))
 	}
@@ -141,6 +145,9 @@ func (i *Item) Search(query queries.PsQuery) ([]Item, rest_errors.RestErr) {
 func getDescription(i *Item, client postgresql.TxandClient) error {
 	descRow := client.QueryRow(ctx, queryGetItemsDescription, i.Id)
 	if err := descRow.Scan(&i.Description.PlainText, &i.Description.Html); err != nil {
+		if err.Error() == errornorows {
+			return nil
+		}
 		return err
 	}
 	return nil
@@ -159,6 +166,7 @@ func getPictures(i *Item, client postgresql.TxandClient) error {
 		if err != nil {
 			return err
 		}
+		pics = append(pics, currentPic)
 	}
 	i.Pictures = pics
 	return nil
