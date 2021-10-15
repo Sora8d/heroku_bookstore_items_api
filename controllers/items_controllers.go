@@ -11,11 +11,14 @@ import (
 	"github.com/Sora8d/bookstore_utils-go/rest_errors"
 	"github.com/Sora8d/heroku_bookstore_items_api/domain/items"
 	"github.com/Sora8d/heroku_bookstore_items_api/domain/queries"
-	"github.com/Sora8d/heroku_bookstore_items_api/localerrors"
 	"github.com/Sora8d/heroku_bookstore_items_api/services"
 	"github.com/Sora8d/heroku_bookstore_items_api/utils/http_utils"
 	"github.com/gorilla/mux"
 )
+
+func init() {
+	oauth.OauthRestClient.SetClient("http://127.0.0.1:8081")
+}
 
 var ItemsController itemsControllerInterface = &itemsController{}
 
@@ -36,7 +39,7 @@ func (it *itemsController) Create(w http.ResponseWriter, r *http.Request) {
 	}
 	sellerId := oauth.GetCallerId(r)
 	if sellerId == 0 {
-		respErr := localerrors.NewUnauthorizedError("invalid request body")
+		respErr := rest_errors.NewUnauthorizedError("invalid request body")
 		http_utils.RespondJson(w, respErr.Status(), respErr)
 		return
 	}

@@ -1,10 +1,9 @@
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/Masterminds/semver/v3 v3.1.1/go.mod h1:VPu/7SZ7ePZ3QOrcuXROw5FAcLl4a0cBrbBpGY/8hQs=
-github.com/Sora8d/bookstore_oauth-go v0.0.0-20211008182225-0196c400b503 h1:9x6JSlBjQbrHrji1Obm4Wp9pXepzviN+iYoe3bJXYws=
-github.com/Sora8d/bookstore_oauth-go v0.0.0-20211008182225-0196c400b503/go.mod h1:x3BmJfyA7a6aPNu1MDCi6oQGq3HUzB85bWviPGGydlE=
-github.com/Sora8d/bookstore_utils-go v0.0.0-20211008143022-f1f62a23ac8a/go.mod h1:ymezsYYddY5vO35dxpBJQ89921lM8x99qs900oYZe7k=
-github.com/Sora8d/bookstore_utils-go v0.0.0-20211013234621-28cd7d89d145 h1:VYN/t0TtRYQf+VP3fVTgxafGBdwaD2Q9uWNSAXWP+ik=
-github.com/Sora8d/bookstore_utils-go v0.0.0-20211013234621-28cd7d89d145/go.mod h1:ymezsYYddY5vO35dxpBJQ89921lM8x99qs900oYZe7k=
+github.com/Sora8d/bookstore_oauth-go v0.0.0-20211015190810-f536ae72791b h1:iWlGy/NLmE1YLqI+jgJfBcvgt5t+BYtc6JS7q4uABPw=
+github.com/Sora8d/bookstore_oauth-go v0.0.0-20211015190810-f536ae72791b/go.mod h1:dZbPfWPFdq1gF8mIxjTBvApNN/L31T/F1/LGG1OiqT8=
+github.com/Sora8d/bookstore_utils-go v0.0.0-20211015171847-405f893a21d0 h1:JBh616TJc0vlFYC5G/nSVMV3HgBltx9lrz+DRszrRMM=
+github.com/Sora8d/bookstore_utils-go v0.0.0-20211015171847-405f893a21d0/go.mod h1:ymezsYYddY5vO35dxpBJQ89921lM8x99qs900oYZe7k=
 github.com/benbjohnson/clock v1.1.0 h1:Q92kusRqC1XV2MjkWETPvjJVqKetz1OzxZB7mHJLju8=
 github.com/benbjohnson/clock v1.1.0/go.mod h1:J11/hYXuz8f4ySSvYwY0FKfm+ezbsZBKZxNJlLklBHA=
 github.com/cockroachdb/apd v1.1.0 h1:3LFP3629v+1aKXU5Q37mxmRxX/pIu1nijXydLShEq5I=

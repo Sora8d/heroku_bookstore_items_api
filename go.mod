@@ -3,8 +3,8 @@ module github.com/Sora8d/heroku_bookstore_items_api
 go 1.17
 
 require (
-	github.com/Sora8d/bookstore_oauth-go v0.0.0-20211008182225-0196c400b503
-	github.com/Sora8d/bookstore_utils-go v0.0.0-20211013234621-28cd7d89d145
+	github.com/Sora8d/bookstore_oauth-go v0.0.0-20211015190810-f536ae72791b
+	github.com/Sora8d/bookstore_utils-go v0.0.0-20211015171847-405f893a21d0
 	github.com/gorilla/mux v1.8.0
 	github.com/jackc/pgx/v4 v4.13.0
 	github.com/joho/godotenv v1.4.0

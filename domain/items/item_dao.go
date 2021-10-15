@@ -117,8 +117,8 @@ func (i *Item) Get() rest_errors.RestErr {
 
 func (i *Item) Search(query queries.PsQuery) ([]Item, rest_errors.RestErr) {
 	var items []Item
-	q, v := query.Build(queryBuild)
-	rows, err := postgresql.Client.Query(ctx, q, v)
+	q, values := query.Build(queryBuild)
+	rows, err := postgresql.Client.Query(ctx, q, values...)
 	if err != nil {
 		return nil, rest_errors.NewInternalServerError("There was an  error building the query", errors.New("database error"))
 	}
@@ -128,16 +128,26 @@ func (i *Item) Search(query queries.PsQuery) ([]Item, rest_errors.RestErr) {
 		if err := rows.Scan(&item.Id, &item.Seller, &item.Title); err != nil {
 			return nil, rest_errors.NewInternalServerError("There was an error parsin the search results", errors.New("database error"))
 		}
-		if err := getDescription(&item, postgresql.Client); err != nil {
-			return nil, rest_errors.NewInternalServerError("error when trying to get item", errors.New("database error"))
-		}
-		if err := getPictures(&item, postgresql.Client); err != nil {
-			return nil, rest_errors.NewInternalServerError("error when trying to get item", errors.New("database error"))
-		}
 		items = append(items, item)
 	}
 	if len(items) == 0 {
 		return nil, rest_errors.NewNotFoundError("No items with specified criteria")
+	}
+	for index, item := range items {
+		tx, err := postgresql.Client.Transaction()
+		if err != nil {
+			logger.Error("There was an error in the search function in items dao", err)
+			return nil, rest_errors.NewInternalServerError("error when trying to get item", errors.New("database error"))
+		}
+		if err := getDescription(&item, tx); err != nil {
+			return nil, rest_errors.NewInternalServerError("error when trying to get item", errors.New("database error"))
+		}
+		if err := getPictures(&item, tx); err != nil {
+			return nil, rest_errors.NewInternalServerError("error when trying to get item", errors.New("database error"))
+		}
+		tx.Commit(ctx)
+		items[index] = item
+		tx.Rollback(ctx)
 	}
 	return items, nil
 }
