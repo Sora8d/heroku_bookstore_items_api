@@ -11,4 +11,7 @@ func Urlmaps() {
 	router.HandleFunc("/items", controllers.ItemsController.Create).Methods(http.MethodPost)
 	router.HandleFunc("/items/{id}", controllers.ItemsController.Get).Methods(http.MethodGet)
 	router.HandleFunc("/items/search", controllers.ItemsController.Search).Methods(http.MethodPost)
+	router.HandleFunc("/items/{id}", controllers.ItemsController.Delete).Methods(http.MethodDelete)
+	router.HandleFunc("/items/{id}", controllers.ItemsController.Update).Methods(http.MethodPut)
+	router.HandleFunc("/items/{id}", controllers.ItemsController.Update).Methods(http.MethodPatch)
 }

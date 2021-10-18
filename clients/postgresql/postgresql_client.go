@@ -17,6 +17,7 @@ var (
 type TxandClient interface {
 	QueryRow(context.Context, string, ...interface{}) pgx.Row
 	Query(context.Context, string, ...interface{}) (pgx.Rows, error)
+	CopyFrom(context.Context, pgx.Identifier, []string, pgx.CopyFromSource) (int64, error)
 }
 
 type postGresInterface interface {
@@ -71,6 +72,8 @@ func (pgc postGresObject) Insert(ctx context.Context, query string, args ...inte
 func (pgc postGresObject) Transaction() (pgx.Tx, error) {
 	return pgc.conn.Begin(context.Background())
 }
+
+//TODO: add a function that acts like copyfrom
 
 //Allows to insert multiple rows fast
 //func (pgc postGresObject) CopyForm(tableName string, columnNames []string, rowSrc [][]interface{})

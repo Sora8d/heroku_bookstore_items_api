@@ -12,13 +12,18 @@ import (
 )
 
 const (
-	queryGetItem              = "SELECT id, seller, title FROM item WHERE id=$1;"
-	queryGetItemsDescription  = "SELECT d.plain_text, d.html FROM description d WHERE d.item_id=$1;"
-	queryGetItemsPictures     = "SELECT p.id, p.url FROM picture p WHERE p.item_id=$1;"
-	querySaveItem             = "INSERT INTO item(seller, title) VALUES ($1, $2) RETURNING id;"
-	querySaveItemsDescription = "INSERT INTO description(item_id, plain_text, html) VALUES($1,$2,$3);"
-	querySaveItemsPictures    = "INSERT INTO picture(item_id, url) VALUES($1, $2);"
-	queryBuild                = "SELECT item.id, item.seller, item.title FROM item INNER JOIN description d ON item.id = d.item_id WHERE %s;"
+	queryGetItem                = "SELECT id, seller, title FROM item WHERE id=$1;"
+	queryGetItemsDescription    = "SELECT d.plain_text, d.html FROM description d WHERE d.item_id=$1;"
+	queryGetItemsPictures       = "SELECT p.id, p.url FROM picture p WHERE p.item_id=$1;"
+	querySaveItem               = "INSERT INTO item(seller, title) VALUES ($1, $2) RETURNING id;"
+	querySaveItemsDescription   = "INSERT INTO description(item_id, plain_text, html) VALUES($1,$2,$3);"
+	querySaveItemsPictures      = "INSERT INTO picture(item_id, url) VALUES($1, $2);"
+	queryUpdateItem             = "UPDATE item SET seller=$1, title=$2 WHERE id=$3;"
+	queryUpdateItemsDescription = "UPDATE description SET plain_text= $1, html=$2 WHERE item_id=$3;"
+	queryDeleteItem             = "DELETE FROM item WHERE id=$1;"
+	queryDeleteItemDescription  = "DELETE FROM description WHERE item_id=$1"
+	queryDeleteItemPictures     = "DELETE FROM picture WHERE item_id=$1"
+	queryBuild                  = "SELECT item.id, item.seller, item.title FROM item INNER JOIN description d ON item.id = d.item_id WHERE %s;"
 
 	picturetable = "picture"
 	errornorows  = "no rows in result set"
@@ -50,14 +55,20 @@ func (i *Item) Save() rest_errors.RestErr {
 		logger.Error("There was an error in the save function in items dao", err)
 		return rest_errors.NewInternalServerError("error when trying to save item", errors.New("database error"))
 	}
+	if err = savePictures(i, resultId, tx); err != nil {
 
-	pictures_row := i.GetPictures(resultId)
-	_, err = tx.CopyFrom(ctx, pgx.Identifier{picturetable}, picturecolumns[:], pgx.CopyFromRows(pictures_row))
-	if err != nil {
 		logger.Error("There was an error in the save function in items dao", err)
 		return rest_errors.NewInternalServerError("error when trying to save item", errors.New("database error"))
-	}
 
+	}
+	/*
+		pictures_row := i.GetPictures(resultId)
+		_, err = tx.CopyFrom(ctx, pgx.Identifier{picturetable}, picturecolumns[:], pgx.CopyFromRows(pictures_row))
+		if err != nil {
+			logger.Error("There was an error in the save function in items dao", err)
+			return rest_errors.NewInternalServerError("error when trying to save item", errors.New("database error"))
+		}
+	*/
 	tx.Commit(ctx)
 
 	i.Id = resultId
@@ -76,7 +87,7 @@ func (i *Item) Get() rest_errors.RestErr {
 	itemRow := tx.QueryRow(ctx, queryGetItem, i.Id)
 	if err := itemRow.Scan(&i.Id, &i.Seller, &i.Title); err != nil {
 		if err.Error() == errornorows {
-			return rest_errors.NewNotFoundError("No user with given id")
+			return rest_errors.NewNotFoundError("No item with given id")
 		}
 		logger.Error("There was an error in the get function in items dao", err)
 		return rest_errors.NewInternalServerError("error when trying to get item", errors.New("database error"))
@@ -152,6 +163,67 @@ func (i *Item) Search(query queries.PsQuery) ([]Item, rest_errors.RestErr) {
 	return items, nil
 }
 
+func (i *Item) Delete() rest_errors.RestErr {
+	tx, err := postgresql.Client.Transaction()
+	if err != nil {
+		logger.Error("There was an error in the update function in items dao", err)
+		return rest_errors.NewInternalServerError("error when trying to update item", errors.New("database error"))
+	}
+	defer tx.Rollback(ctx)
+
+	_, err = tx.Exec(ctx, queryDeleteItemDescription, i.Id)
+	if err != nil {
+		logger.Error("Catching to check if not found is considered an err", err)
+		return rest_errors.NewBadRequestErr("There was an error trying to update this item in the database")
+	}
+	_, err = tx.Exec(ctx, queryDeleteItemPictures, i.Id)
+	if err != nil {
+		logger.Error("Catching to check if not found is considered an err", err)
+		return rest_errors.NewBadRequestErr("There was an error trying to update this item in the database")
+	}
+	_, err = tx.Exec(ctx, queryDeleteItem, i.Id)
+	if err != nil {
+		logger.Error("Catching to check if not found is considered an err", err)
+		return rest_errors.NewBadRequestErr("There was an error trying to update this item in the database")
+	}
+	tx.Commit(ctx)
+	return nil
+}
+
+func (i *Item) Update() rest_errors.RestErr {
+	tx, err := postgresql.Client.Transaction()
+	if err != nil {
+		logger.Error("There was an error in the update function in items dao", err)
+		return rest_errors.NewInternalServerError("error when trying to update item", errors.New("database error"))
+	}
+	defer tx.Rollback(ctx)
+
+	_, err = tx.Exec(ctx, queryUpdateItem, i.Seller, i.Title, i.Id)
+	if err != nil {
+		logger.Error("Catching to check if not found is considered an err", err)
+		return rest_errors.NewBadRequestErr("There was an error trying to update this item in the database")
+	}
+
+	_, err = tx.Exec(ctx, queryUpdateItemsDescription, i.Description.PlainText, i.Description.Html, i.Id)
+	if err != nil {
+		logger.Error("Catching to check if not found is considered an err", err)
+		return rest_errors.NewBadRequestErr("There was an error trying to update this item in the database")
+	}
+
+	_, err = tx.Exec(ctx, queryDeleteItemPictures, i.Id)
+	if err != nil {
+		logger.Error("Catching to check if not found is considered an err", err)
+		return rest_errors.NewBadRequestErr("There was an error trying to update this item in the database")
+	}
+
+	if err = savePictures(i, i.Id, tx); err != nil {
+		return rest_errors.NewBadRequestErr("There was an error updating the pictures of the item")
+	}
+
+	tx.Commit(ctx)
+	return nil
+}
+
 func getDescription(i *Item, client postgresql.TxandClient) error {
 	descRow := client.QueryRow(ctx, queryGetItemsDescription, i.Id)
 	if err := descRow.Scan(&i.Description.PlainText, &i.Description.Html); err != nil {
@@ -179,5 +251,14 @@ func getPictures(i *Item, client postgresql.TxandClient) error {
 		pics = append(pics, currentPic)
 	}
 	i.Pictures = pics
+	return nil
+}
+
+func savePictures(i *Item, id int64, client postgresql.TxandClient) error {
+	pictures_row := i.GetPictures(id)
+	_, err := client.CopyFrom(ctx, pgx.Identifier{picturetable}, picturecolumns[:], pgx.CopyFromRows(pictures_row))
+	if err != nil {
+		return err
+	}
 	return nil
 }
