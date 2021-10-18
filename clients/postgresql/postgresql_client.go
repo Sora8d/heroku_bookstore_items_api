@@ -29,7 +29,7 @@ type postGresInterface interface {
 }
 
 func init() {
-	datasourceName := fmt.Sprintf("postgres://%s",
+	datasourceName := fmt.Sprintf("%s",
 		config.Config["database"])
 	newConn, err := pgx.Connect(context.Background(), datasourceName)
 	if err != nil {
