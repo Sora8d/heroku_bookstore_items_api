@@ -29,10 +29,8 @@ type postGresInterface interface {
 }
 
 func init() {
-	datasourceName := fmt.Sprintf("postgres://%s:%s@localhost:5432/%s",
-		config.Config["items_postgres_username"],
-		config.Config["items_postgres_password"],
-		config.Config["items_postgres_schema"])
+	datasourceName := fmt.Sprintf("postgres://%s",
+		config.Config["database"])
 	newConn, err := pgx.Connect(context.Background(), datasourceName)
 	if err != nil {
 		logger.Error("Fatal error initializing db", err)

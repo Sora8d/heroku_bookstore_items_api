@@ -9,6 +9,7 @@ import (
 
 	"github.com/Sora8d/bookstore_oauth-go/oauth"
 	"github.com/Sora8d/bookstore_utils-go/rest_errors"
+	"github.com/Sora8d/heroku_bookstore_items_api/config"
 	"github.com/Sora8d/heroku_bookstore_items_api/domain/items"
 	"github.com/Sora8d/heroku_bookstore_items_api/domain/queries"
 	"github.com/Sora8d/heroku_bookstore_items_api/services"
@@ -17,7 +18,7 @@ import (
 )
 
 func init() {
-	oauth.OauthRestClient.SetClient("http://127.0.0.1:8081")
+	oauth.OauthRestClient.SetClient(config.Config["oauth"])
 }
 
 var ItemsController itemsControllerInterface = &itemsController{}

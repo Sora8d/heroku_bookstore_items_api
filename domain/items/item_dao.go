@@ -12,13 +12,13 @@ import (
 )
 
 const (
-	queryGetItem                = "SELECT id, seller, title FROM item WHERE id=$1;"
+	queryGetItem                = "SELECT id, seller, title, price FROM item WHERE id=$1;"
 	queryGetItemsDescription    = "SELECT d.plain_text, d.html FROM description d WHERE d.item_id=$1;"
 	queryGetItemsPictures       = "SELECT p.id, p.url FROM picture p WHERE p.item_id=$1;"
-	querySaveItem               = "INSERT INTO item(seller, title) VALUES ($1, $2) RETURNING id;"
+	querySaveItem               = "INSERT INTO item(seller, title, price) VALUES ($1, $2, $3) RETURNING id;"
 	querySaveItemsDescription   = "INSERT INTO description(item_id, plain_text, html) VALUES($1,$2,$3);"
 	querySaveItemsPictures      = "INSERT INTO picture(item_id, url) VALUES($1, $2);"
-	queryUpdateItem             = "UPDATE item SET seller=$1, title=$2 WHERE id=$3;"
+	queryUpdateItem             = "UPDATE item SET seller=$1, title=$2, price=$3 WHERE id=$4;"
 	queryUpdateItemsDescription = "UPDATE description SET plain_text= $1, html=$2 WHERE item_id=$3;"
 	queryDeleteItem             = "DELETE FROM item WHERE id=$1;"
 	queryDeleteItemDescription  = "DELETE FROM description WHERE item_id=$1"
@@ -44,7 +44,7 @@ func (i *Item) Save() rest_errors.RestErr {
 	}
 	defer tx.Rollback(ctx)
 
-	row := tx.QueryRow(ctx, querySaveItem, i.Seller, i.Title)
+	row := tx.QueryRow(ctx, querySaveItem, i.Seller, i.Title, i.Price)
 	var resultId int64
 	if err := row.Scan(&resultId); err != nil {
 		logger.Error("There was an error in the save function in items dao", err)
@@ -85,7 +85,7 @@ func (i *Item) Get() rest_errors.RestErr {
 	defer tx.Rollback(ctx)
 
 	itemRow := tx.QueryRow(ctx, queryGetItem, i.Id)
-	if err := itemRow.Scan(&i.Id, &i.Seller, &i.Title); err != nil {
+	if err := itemRow.Scan(&i.Id, &i.Seller, &i.Title, &i.Price); err != nil {
 		if err.Error() == errornorows {
 			return rest_errors.NewNotFoundError("No item with given id")
 		}
@@ -136,7 +136,7 @@ func (i *Item) Search(query queries.PsQuery) ([]Item, rest_errors.RestErr) {
 	defer rows.Close()
 	for rows.Next() {
 		var item Item
-		if err := rows.Scan(&item.Id, &item.Seller, &item.Title); err != nil {
+		if err := rows.Scan(&item.Id, &item.Seller, &item.Title, &item.Price); err != nil {
 			return nil, rest_errors.NewInternalServerError("There was an error parsin the search results", errors.New("database error"))
 		}
 		items = append(items, item)
@@ -198,7 +198,7 @@ func (i *Item) Update() rest_errors.RestErr {
 	}
 	defer tx.Rollback(ctx)
 
-	_, err = tx.Exec(ctx, queryUpdateItem, i.Seller, i.Title, i.Id)
+	_, err = tx.Exec(ctx, queryUpdateItem, i.Seller, i.Title, i.Price, i.Id)
 	if err != nil {
 		logger.Error("Catching to check if not found is considered an err", err)
 		return rest_errors.NewBadRequestErr("There was an error trying to update this item in the database")

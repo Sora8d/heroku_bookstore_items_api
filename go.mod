@@ -1,4 +1,5 @@
 module github.com/Sora8d/heroku_bookstore_items_api
+
 // +heroku goVersion go1.17
 go 1.17
 
@@ -7,7 +8,6 @@ require (
 	github.com/Sora8d/bookstore_utils-go v0.0.0-20211015171847-405f893a21d0
 	github.com/gorilla/mux v1.8.0
 	github.com/jackc/pgx/v4 v4.13.0
-	github.com/joho/godotenv v1.4.0
 )
 
 require (
