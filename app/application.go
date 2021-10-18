@@ -3,6 +3,7 @@ package app
 import (
 	"net/http"
 
+	"github.com/Sora8d/heroku_bookstore_items_api/config"
 	"github.com/gorilla/mux"
 )
 
@@ -13,7 +14,7 @@ func StartApplication() {
 
 	srv := &http.Server{
 		Handler: router,
-		Addr:    "127.0.0.1:8082",
+		Addr:    config.Config["address"],
 	}
 	if err := srv.ListenAndServe(); err != nil {
 		panic(err)

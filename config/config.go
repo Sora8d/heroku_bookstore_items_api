@@ -20,6 +20,7 @@ func init() {
 		"items_postgres_password": os.Getenv("items_postgres_password"),
 		"items_postgres_schema":   os.Getenv("items_postgres_schema"),
 		"items_postgres_host":     os.Getenv("items_postgres_host"),
+		"address":                 os.Getenv("adress"),
 	}
 }
 
