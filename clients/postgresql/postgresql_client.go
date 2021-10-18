@@ -2,7 +2,6 @@ package postgresql
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/Sora8d/bookstore_utils-go/logger"
 	"github.com/Sora8d/heroku_bookstore_items_api/config"
@@ -29,8 +28,7 @@ type postGresInterface interface {
 }
 
 func init() {
-	datasourceName := fmt.Sprintf("%s",
-		config.Config["database"])
+	datasourceName := config.Config["database"]
 	newConn, err := pgx.Connect(context.Background(), datasourceName)
 	if err != nil {
 		logger.Error("Fatal error initializing db", err)
