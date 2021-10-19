@@ -11,6 +11,7 @@ func init() {
 		"database": os.Getenv("DATABASE_URL"),
 		"address":  os.Getenv("adress"),
 		"oauth":    os.Getenv("oauth"),
+		"port":     os.Getenv("PORT"),
 	}
 }
 

@@ -8,13 +8,16 @@ import (
 )
 
 var router = mux.NewRouter()
+var port = config.Config["port"]
 
 func StartApplication() {
 	Urlmaps()
-
+	if port == "" {
+		port = ":8080"
+	}
 	srv := &http.Server{
 		Handler: router,
-		Addr:    config.Config["address"],
+		Addr:    config.Config["address"] + port,
 	}
 	if err := srv.ListenAndServe(); err != nil {
 		panic(err)
