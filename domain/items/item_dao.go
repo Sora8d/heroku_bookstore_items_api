@@ -23,7 +23,7 @@ const (
 	queryDeleteItem             = "DELETE FROM item WHERE id=$1;"
 	queryDeleteItemDescription  = "DELETE FROM description WHERE item_id=$1"
 	queryDeleteItemPictures     = "DELETE FROM picture WHERE item_id=$1"
-	queryBuild                  = "SELECT item.id, item.seller, item.title FROM item INNER JOIN description d ON item.id = d.item_id WHERE %s;"
+	queryBuild                  = "SELECT item.id, item.seller, item.title, item.price FROM item INNER JOIN description d ON item.id = d.item_id WHERE %s;"
 
 	picturetable = "picture"
 	errornorows  = "no rows in result set"
