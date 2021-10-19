@@ -62,6 +62,9 @@ func (s *itemsService) Update(item items.Item, permissions bool) (*items.Item, r
 	if item.Description.Html != "" {
 		original_item.Description.Html = item.Description.Html
 	}
+	if item.Price != 0 {
+		original_item.Price = item.Price
+	}
 	if err := original_item.Update(); err != nil {
 		return nil, err
 	}
