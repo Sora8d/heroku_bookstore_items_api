@@ -17,7 +17,7 @@ func StartApplication() {
 	}
 	srv := &http.Server{
 		Handler: router,
-		Addr:    config.Config["address"] + port,
+		//		Addr:    config.Config["address"] + port,
 	}
 	if err := srv.ListenAndServe(); err != nil {
 		panic(err)
